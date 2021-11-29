@@ -5,6 +5,9 @@ const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
 app.set("view engine", "ejs");
 
 //Database of shortURL and longURL
@@ -22,6 +25,12 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
+});
+
+// Login to the page
+app.post("/login", (req, res) => {
+  res.cookie("username", req.body["username"]);
+  res.redirect(`urls`);
 });
 
 // Create TinyURL http://localhost:8080/urls/new
