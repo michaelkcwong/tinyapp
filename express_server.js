@@ -7,36 +7,43 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs");
 
+//Database of shortURL and longURL
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
+//Hello http://localhost:8080/
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
-app.get("/urls.json", (req, res) => {
+// My URLs http://localhost:8080/urls/
+app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
+// Create TinyURL http://localhost:8080/urls/new
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+// Post Submission http://localhost:8080/urls/udjxhd
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body["longURL"];
   res.redirect(`/urls/${shortURL}`);
   });
 
+// Post of Post submission 
 app.get("/urls/:shortURL", (req, res) => {
 const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
 req.params.shortURL = templateVars.shortURL;
 res.render("urls_show", templateVars);
 });
 
+// TinyURL for x
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
