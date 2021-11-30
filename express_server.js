@@ -19,6 +19,7 @@ const urlDatabase = {
   "9sm5xK": "https://www.google.com",
 };
 
+//Database of users
 const userDatabase = {};
 
 // /localhost:8080
