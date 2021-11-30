@@ -12,8 +12,8 @@ app.set("view engine", "ejs");
 
 //Database of shortURL and longURL
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": "https://www.lighthouselabs.ca",
+  "9sm5xK": "https://www.google.com",
 };
 
 //Hello http://localhost:8080/
@@ -27,12 +27,6 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-// Login to the page
-app.post("/login", (req, res) => {
-  res.cookie("username", req.body["username"]);
-  res.redirect(`urls`);
-});
-
 // Create TinyURL http://localhost:8080/urls/new
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
@@ -44,6 +38,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = req.body["longURL"];
   res.redirect(`/urls/${shortURL}`);
   });
+
 
 // URL Delete button
 app.post("/urls/:shortURL/delete", (req, res) => {
@@ -76,6 +71,6 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-function generateRandomString() {
+const generateRandomString = function() {
 return Math.random().toString(36).substring(2,8);
 };
