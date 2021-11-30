@@ -28,13 +28,20 @@ app.get("/", (req, res) => {
 
 // My URLs /urls page
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = {urls: urlDatabase};
+  const templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["username"]
+  };
   res.render("urls_index", templateVars);
 });
 
 // Create TinyURL page /urls/new
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {
+    username: req.cookies["username"]
+  };
+  res.render("urls_new", templateVars);
 });
 
 // TinyURL Creation page 
@@ -57,6 +64,12 @@ app.post("/login", (req, res) => {
   res.redirect(`/urls`);
 });
 
+// Logging Out 
+app.post("/logout", (req, res) => {
+  delete res.cookie("username", req.body["username"]);
+  res.redirect(`/urls`);
+});
+
 // Edit URL
 app.post("/urls/:shortURL/update", (req, res) => {
   delete urlDatabase[req.params.shortURL]
@@ -67,9 +80,13 @@ app.post("/urls/:shortURL/update", (req, res) => {
 
 // after TinyURL page /urls/TinyURL page
 app.get("/urls/:shortURL", (req, res) => {
-const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
-req.params.shortURL = templateVars.shortURL;
-res.render("urls_show", templateVars);
+  const templateVars = { 
+    shortURL: req.params.shortURL, 
+    longURL: urlDatabase[req.params.shortURL],
+    username: req.cookies["username"]
+  };
+  req.params.shortURL = templateVars.shortURL;
+  res.render("urls_show", templateVars);
 });
 
 // TinyURL redirect to website
