@@ -28,7 +28,6 @@ app.get("/", (req, res) => {
 
 // My URLs /urls page
 app.get("/urls", (req, res) => {
-  const templateVars = {urls: urlDatabase};
   const templateVars = {
     urls: urlDatabase,
     username: req.cookies["username"]
