@@ -19,6 +19,8 @@ const urlDatabase = {
   "9sm5xK": "https://www.google.com",
 };
 
+const userDatabase = {};
+
 // /localhost:8080
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -47,6 +49,12 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
+});
+
+// Login
+app.post("/login", (req, res) => {
+  res.cookie("username", req.body["username"]);
+  res.redirect(`/urls`);
 });
 
 // Edit URL
