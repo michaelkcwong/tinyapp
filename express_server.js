@@ -36,6 +36,14 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+// GET /register
+app.get('/register', (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"]
+  };
+  res.render('registration', templateVars)
+});
+
 // Create TinyURL page /urls/new
 app.get("/urls/new", (req, res) => {
   const templateVars = {
