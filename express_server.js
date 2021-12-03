@@ -24,13 +24,24 @@ const urlDatabase = {
 };
 
 //Database of users
-const users = { 
+const usersDatabase = { 
   "ab123": {
     id: "ab123", 
     email: "test@email.com", 
     password: "abc"
   }
 };
+
+//function for checking if the user already exists in users database
+const existingUserInUsers = (email) => {
+  for (let obj in usersDatabase) {
+    let user = usersDatabase[obj];
+    if (user.email === email) {
+      return true;
+    }
+  }
+  return false;
+}
 
 findUserByEmail = (object, cookie) => {
   return object[cookie];
@@ -43,7 +54,7 @@ app.get("/", (req, res) => {
 
 // My URLs /urls page
 app.get("/urls", (req, res) => {
-  const user = findUserByEmail(users, req.cookies["user_id"]);
+  const user = findUserByEmail(usersDatabase, req.cookies["user_id"]);
   const templateVars = {
     urls: urlDatabase,
     user: user
@@ -53,8 +64,9 @@ app.get("/urls", (req, res) => {
 
 // GET /register
 app.get('/register', (req, res) => {
+  const user = findUserByEmail(usersDatabase, req.cookies["user_id"]);
   const templateVars = {
-    user: null
+    user: user
   };
   res.render('registration', templateVars)
 });
@@ -65,17 +77,27 @@ app.post('/register', (req, res) => {
   const password = req.body.password;
   randomID = generateRandomString();
   const newUser = {};
+
+  //validate information
+  if (!email || !password) {
+    return res.status(400).send('Email and password cannot be empty!');
+  }
+
+//validate if user exists
+if(existingUserInUsers(email)) {
+  return res.status(400).send('Email is already registered!');
+}
   newUser["id"] = randomID
   newUser["email"] = req.body.email;
   newUser["password"] = req.body.password;
   res.cookie("user_id", newUser["id"]);
-  users[randomID] = newUser;
+  usersDatabase[randomID] = newUser;
   res.redirect('/urls');
 });
 
 // Create TinyURL page /urls/new
 app.get("/urls/new", (req, res) => {
-  const user = findUserByEmail(users, req.cookies["user_id"]);
+  const user = findUserByEmail(usersDatabase, req.cookies["user_id"]);
   const templateVars = {
     user: user
   };
@@ -104,7 +126,7 @@ app.post("/login", (req, res) => {
 
 // Logging Out 
 app.post("/logout", (req, res) => {
-  delete res.cookie("user_id", req.body["username"]);
+  res.clearCookie("user_id", req.body["username"]);
   res.redirect(`/urls`);
 });
 
@@ -118,7 +140,7 @@ app.post("/urls/:shortURL/update", (req, res) => {
 
 // after TinyURL page /urls/TinyURL page
 app.get("/urls/:shortURL", (req, res) => {
-  const user = findUserByEmail(users, req.cookies["user_id"]);
+  const user = findUserByEmail(usersDatabase, req.cookies["user_id"]);
   const templateVars = { 
     shortURL: req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL],
