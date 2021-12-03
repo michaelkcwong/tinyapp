@@ -71,6 +71,12 @@ app.get("/login", (req, res) => {
   res.render("login", templateVars);
 });
 
+// Login
+app.post("/login", (req, res) => {
+  res.cookie("user_id", req.body["username"]);
+  res.redirect(`/urls`);
+});
+
 // GET /register
 app.get('/register', (req, res) => {
   const user = findUserByEmail(usersDatabase, req.cookies["user_id"]);
@@ -127,11 +133,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect("/urls");
 });
 
-// Login
-app.post("/login", (req, res) => {
-  res.cookie("user_id", req.body["username"]);
-  res.redirect(`/urls`);
-});
 
 // Logging Out 
 app.post("/logout", (req, res) => {
