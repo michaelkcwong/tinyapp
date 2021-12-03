@@ -20,7 +20,13 @@ const urlDatabase = {
 };
 
 //Database of users
-const userDatabase = {};
+const users = { 
+  "ab123": {
+    id: "ab123", 
+    email: "test@email.com", 
+    password: "abc"
+  }
+};
 
 // /localhost:8080
 app.get("/", (req, res) => {
