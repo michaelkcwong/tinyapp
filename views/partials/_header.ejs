@@ -13,7 +13,7 @@
         <% if(!user || user === "undefined") { %>
           <a class="nav-item nav-link" href="/login">Login</a>
           <a class="nav-item nav-link" href="/register">Register</a>
-          <% } else { %>
+          <% } else if (user) { %>
           <form class="form-inline" action="/logout" method="POST">
             <nav class="navbar">
               <span class="navbar-text-dark">
