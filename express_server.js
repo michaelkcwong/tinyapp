@@ -10,6 +10,10 @@ app.use(bodyParser.urlencoded({extended: true}));
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 
+const generateRandomString = function() {
+  return Math.random().toString(36).substring(2,8);
+  };
+
 //Template view engine to EJS
 app.set("view engine", "ejs");
 
@@ -28,6 +32,10 @@ const users = {
   }
 };
 
+findUserByEmail = (object, cookie) => {
+  return object[cookie];
+}
+
 // /localhost:8080
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -35,9 +43,10 @@ app.get("/", (req, res) => {
 
 // My URLs /urls page
 app.get("/urls", (req, res) => {
+  const user = findUserByEmail(users, req.cookies["user_id"]);
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    user: user
   };
   res.render("urls_index", templateVars);
 });
@@ -45,15 +54,30 @@ app.get("/urls", (req, res) => {
 // GET /register
 app.get('/register', (req, res) => {
   const templateVars = {
-    username: req.cookies["username"]
+    user: null
   };
   res.render('registration', templateVars)
 });
 
+// POST /register
+app.post('/register', (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  randomID = generateRandomString();
+  const newUser = {};
+  newUser["id"] = randomID
+  newUser["email"] = req.body.email;
+  newUser["password"] = req.body.password;
+  res.cookie("user_id", newUser["id"]);
+  users[randomID] = newUser;
+  res.redirect('/urls');
+});
+
 // Create TinyURL page /urls/new
 app.get("/urls/new", (req, res) => {
+  const user = findUserByEmail(users, req.cookies["user_id"]);
   const templateVars = {
-    username: req.cookies["username"]
+    user: user
   };
   res.render("urls_new", templateVars);
 });
@@ -74,13 +98,13 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 // Login
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body["username"]);
+  res.cookie("user_id", req.body["username"]);
   res.redirect(`/urls`);
 });
 
 // Logging Out 
 app.post("/logout", (req, res) => {
-  delete res.cookie("username", req.body["username"]);
+  delete res.cookie("user_id", req.body["username"]);
   res.redirect(`/urls`);
 });
 
@@ -94,10 +118,11 @@ app.post("/urls/:shortURL/update", (req, res) => {
 
 // after TinyURL page /urls/TinyURL page
 app.get("/urls/:shortURL", (req, res) => {
+  const user = findUserByEmail(users, req.cookies["user_id"]);
   const templateVars = { 
     shortURL: req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies["username"]
+    user: user
   };
   req.params.shortURL = templateVars.shortURL;
   res.render("urls_show", templateVars);
@@ -112,7 +137,3 @@ app.get("/u/:shortURL", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-const generateRandomString = function() {
-return Math.random().toString(36).substring(2,8);
-};
