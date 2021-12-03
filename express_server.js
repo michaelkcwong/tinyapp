@@ -62,6 +62,15 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+// GET /login
+app.get("/login", (req, res) => {
+  const user = findUserByEmail(usersDatabase, req.cookies["user_id"]);
+  const templateVars = {
+    user:user
+  };
+  res.render("login", templateVars);
+});
+
 // GET /register
 app.get('/register', (req, res) => {
   const user = findUserByEmail(usersDatabase, req.cookies["user_id"]);
