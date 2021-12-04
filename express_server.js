@@ -131,11 +131,14 @@ if(existingUserInUsers(email)) {
 
 // Create TinyURL page /urls/new
 app.get("/urls/new", (req, res) => {
-  const user = findUserByEmail(usersDatabase, req.cookies["user_id"]);
-  const templateVars = {
-    user: user
-  };
-  res.render("urls_new", templateVars);
+  if (req.cookies["user_id"]) {
+    const user = findUserByEmail(usersDatabase, req.cookies["user_id"]);
+    const templateVars = {
+      user: user
+    };
+    return res.render("urls_new", templateVars);
+  }
+  return res.redirect("/login");
 });
 
 // TinyURL Creation page 
