@@ -30,7 +30,7 @@ const usersDatabase = {
   "ab123": {
     id: "ab123", 
     email: "test@email.com", 
-    password: "abc"
+    password: bcrypt.hashSync("123",10)
   }
 };
 
@@ -47,7 +47,7 @@ const existingUserInUsers = (email) => {
 
 //function for checking if the user's password matches what is in the userDatabase
 const passwordMatch = (user, password) => {
-  if (user.password === password) {
+  if (bcrypt.compareSync(password, user.password)) {
     return true;
   }
   return false;
@@ -115,6 +115,9 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+  if (!email || !password) {
+    return res.status(400).send('Email and password cannot be empty!');
+  }
   if (existingUserInUsers(email)) {
     const user = existingUserInUsers(email);
     if (passwordMatch(user, password)) {
