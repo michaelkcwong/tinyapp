@@ -10,6 +10,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 
+//function that generates a random string for user IDS
 const generateRandomString = function() {
   return Math.random().toString(36).substring(2,8);
   };
@@ -43,6 +44,7 @@ const existingUserInUsers = (email) => {
   return false;
 };
 
+//function for checking if the user's password matches what is in the userDatabase
 const passwordMatch = (user, password) => {
   if (user.password === password) {
     return true;
@@ -50,7 +52,7 @@ const passwordMatch = (user, password) => {
   return false;
 };
 
-
+//function that gets the user from the userDatabase
 findUserByEmail = (object, cookie) => {
   return object[cookie];
 };
@@ -70,7 +72,7 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-// GET /login
+// GET /login page
 app.get("/login", (req, res) => {
   const user = findUserByEmail(usersDatabase, req.cookies["user_id"]);
   const templateVars = {
@@ -79,7 +81,7 @@ app.get("/login", (req, res) => {
   res.render("login", templateVars);
 });
 
-// Login
+// Login into tinyapp
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -90,11 +92,11 @@ app.post("/login", (req, res) => {
       return res.redirect("/urls");
     }
   }
-  return res.status(403).send("Email and or password does not match")
+  return res.status(403).send("Login email and password combination is not in our records!")
   
 });
 
-// GET /register
+// GET /register page
 app.get('/register', (req, res) => {
   const user = findUserByEmail(usersDatabase, req.cookies["user_id"]);
   const templateVars = {
@@ -103,7 +105,7 @@ app.get('/register', (req, res) => {
   res.render('registration', templateVars)
 });
 
-// POST /register
+// POST /register new user
 app.post('/register', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -153,8 +155,8 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 // Logging Out 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id", req.body["username"]);
-  res.redirect(`/urls`);
+  res.clearCookie("user_id");
+  res.redirect(`/login`);
 });
 
 // Edit URL
