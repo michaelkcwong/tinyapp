@@ -37,15 +37,23 @@ const existingUserInUsers = (email) => {
   for (let obj in usersDatabase) {
     let user = usersDatabase[obj];
     if (user.email === email) {
-      return true;
-    }
+      return user;
+  }
+}
+  return false;
+};
+
+const passwordMatch = (user, password) => {
+  if (user.password === password) {
+    return true;
   }
   return false;
-}
+};
+
 
 findUserByEmail = (object, cookie) => {
   return object[cookie];
-}
+};
 
 // /localhost:8080
 app.get("/", (req, res) => {
@@ -73,8 +81,17 @@ app.get("/login", (req, res) => {
 
 // Login
 app.post("/login", (req, res) => {
-  res.cookie("user_id", req.body["username"]);
-  res.redirect(`/urls`);
+  const email = req.body.email;
+  const password = req.body.password;
+  if (existingUserInUsers(email)) {
+    const user = existingUserInUsers(email);
+    if (passwordMatch(user, password)) {
+      res.cookie("user_id", user.id);
+      return res.redirect("/urls");
+    }
+  }
+  return res.status(403).send("Email and or password does not match")
+  
 });
 
 // GET /register
