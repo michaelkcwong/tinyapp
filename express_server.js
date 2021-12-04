@@ -8,8 +8,11 @@ const bcrypt = require('bcrypt');
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
-const cookieParser = require("cookie-parser");
-app.use(cookieParser());
+const cookieSession = require('cookie-session')
+app.use(cookieSession({
+  name: 'session',
+  keys: ["key1", "key2"],
+}));
 
 //function that generates a random string for user IDS
 const generateRandomString = function() {
@@ -78,7 +81,7 @@ app.get("/", (req, res) => {
 
 //User not found page
 app.get("/usernotfound", (req, res) => {
-  if (!req.cookies.user_id) {
+  if (!req.session.user_id) {
     const user = null;
     const templateVars = {
       user: user,
@@ -90,9 +93,9 @@ app.get("/usernotfound", (req, res) => {
 
 // My URLs /urls page
 app.get("/urls", (req, res) => {
-  if(req.cookies.user_id) {
-    const user = findUserByEmail(usersDatabase, req.cookies["user_id"]);
-    const urlList = urlsForUser(req.cookies.user_id);
+  if(req.session.user_id) {
+    const user = findUserByEmail(usersDatabase, req.session["user_id"]);
+    const urlList = urlsForUser(req.session.user_id);
     const templateVars = {
       urls: urlList,
       user: user,
@@ -104,7 +107,7 @@ return res.redirect("/usernotfound");
 
 // GET /login page
 app.get("/login", (req, res) => {
-  const user = findUserByEmail(usersDatabase, req.cookies["user_id"]);
+  const user = findUserByEmail(usersDatabase, req.session["user_id"]);
   const templateVars = {
     user:user
   };
@@ -121,7 +124,7 @@ app.post("/login", (req, res) => {
   if (existingUserInUsers(email)) {
     const user = existingUserInUsers(email);
     if (passwordMatch(user, password)) {
-      res.cookie("user_id", user.id);
+      req.session.user_id = user.id;
       return res.redirect("/urls");
     }
   }
@@ -131,7 +134,7 @@ app.post("/login", (req, res) => {
 
 // GET /register page
 app.get('/register', (req, res) => {
-  const user = findUserByEmail(usersDatabase, req.cookies["user_id"]);
+  const user = findUserByEmail(usersDatabase, req.session["user_id"]);
   const templateVars = {
     user: user
   };
@@ -141,6 +144,7 @@ app.get('/register', (req, res) => {
 // POST /register new user
 app.post('/register', (req, res) => {
   const email = req.body.email;
+  const password = req.body.password;
   randomID = generateRandomString();
   const newUser = {};
 
@@ -156,15 +160,15 @@ if(existingUserInUsers(email)) {
   newUser["id"] = randomID
   newUser["email"] = req.body.email;
   newUser["password"] = bcrypt.hashSync(req.body["password"],10);
-  res.cookie("user_id", newUser["id"]);
+  req.session.user_id = newUser["id"];
   usersDatabase[randomID] = newUser;
   res.redirect('/urls');
 });
 
 // Create TinyURL page /urls/new
 app.get("/urls/new", (req, res) => {
-  if (req.cookies["user_id"]) {
-    const user = findUserByEmail(usersDatabase, req.cookies["user_id"]);
+  if (req.session["user_id"]) {
+    const user = findUserByEmail(usersDatabase, req.session["user_id"]);
     const templateVars = {
       user: user
     };
@@ -176,14 +180,15 @@ app.get("/urls/new", (req, res) => {
 // TinyURL Creation page 
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = {longURL: req.body["longURL"], userID: req.cookies["user_id"]};
+  const cookie = req.session.user_id;
+  urlDatabase[shortURL] = {longURL: req.body["longURL"], userID: cookie};
   res.redirect(`/urls/${shortURL}`);
   });
 
 
 // Delete URL
 app.post("/urls/:shortURL/delete", (req, res) => {
-  const cookie = req.cookies.user_id;
+  const cookie = req.session.user_id;
   const shortURL = req.params.shortURL;
   if (cookie && urlDatabase[shortURL].userID === cookie) {
     delete urlDatabase[shortURL];
@@ -195,13 +200,13 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 // Logging Out 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  req.session = null;
   res.redirect(`/login`);
 });
 
 // Update URL
 app.post("/urls/:shortURL/update", (req, res) => {
-  const cookie = req.cookies.user_id;
+  const cookie = req.session.user_id;
   const shortURL = req.params.shortURL;
   if (cookie && urlDatabase[shortURL].userID === cookie) {
   delete urlDatabase[req.params.shortURL]
@@ -214,7 +219,7 @@ return res.redirect("/usernotfound")
 
 // after TinyURL page /urls/TinyURL page
 app.get("/urls/:shortURL", (req, res) => {
-  const cookie = req.cookies.user_id;
+  const cookie = req.session.user_id;
   const shortURL = req.params.shortURL;
   if (cookie && urlDatabase[shortURL].userID === cookie) {
     const user = findUserByEmail(usersDatabase, cookie);
@@ -231,7 +236,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
 // TinyURL redirect to website
 app.get("/u/:shortURL", (req, res) => {
-  const cookie = req.cookies.user_id;
+  const cookie = req.session.user_id;
   const shortURL = req.params.shortURL
   if(cookie && urlDatabase[shortURL].userID === cookie) {
     const user = findUserByEmail(usersDatabase, cookie);
