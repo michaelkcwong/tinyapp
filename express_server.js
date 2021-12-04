@@ -75,6 +75,18 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+//User not found page
+app.get("/usernotfound", (req, res) => {
+  if (!req.cookies.user_id) {
+    const user = null;
+    const templateVars = {
+      user: user,
+    };
+    return res.render("require_login", templateVars);
+  }
+  return res.redirect("/urls");
+});
+
 // My URLs /urls page
 app.get("/urls", (req, res) => {
   if(req.cookies.user_id) {
@@ -86,7 +98,7 @@ app.get("/urls", (req, res) => {
     };
   return res.render("urls_index", templateVars);
 }
-return res.redirect("/login");
+return res.redirect("/usernotfound");
 });
 
 // GET /login page
@@ -112,6 +124,7 @@ app.post("/login", (req, res) => {
   return res.status(403).send("Login email and password combination is not in our records!")
   
 });
+
 
 // GET /register page
 app.get('/register', (req, res) => {
@@ -155,7 +168,7 @@ app.get("/urls/new", (req, res) => {
     };
     return res.render("urls_new", templateVars);
   }
-  return res.redirect("/login");
+  return res.redirect("/usernotfound");
 });
 
 // TinyURL Creation page 
@@ -190,15 +203,18 @@ app.post("/urls/:shortURL/update", (req, res) => {
 // after TinyURL page /urls/TinyURL page
 app.get("/urls/:shortURL", (req, res) => {
   const cookie = req.cookies.user_id;
-  const shortURL = req.params.shortURL;
-  const user = findUserByEmail(usersDatabase, cookie);
-  const templateVars = {
-    shortURL: shortURL,
-    longURL: urlForUser(cookie)[shortURL],
-    user: user
-  };
-  req.params.shortURL = templateVars.shortURL;
-  res.render("urls_show", templateVars);
+  const shortURL = req.params.shortURL
+  if (cookie && urlDatabase[shortURL].userID === cookie) {
+    const user = findUserByEmail(usersDatabase, cookie);
+    const templateVars = { 
+      shortURL: shortURL, 
+      longURL: urlForUser(cookie)[shortURL],
+      user: user
+    };
+    req.params.shortURL = templateVars.shortURL;
+    return res.render("urls_show", templateVars);
+  }
+  return res.redirect("/usernotfound");
 });
 
 // TinyURL redirect to website
