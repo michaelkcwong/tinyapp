@@ -53,7 +53,7 @@ const passwordMatch = (user, password) => {
 };
 
 //function that gets user specific url from database
-const urlForUser = userID => {
+const urlsForUser = userID => {
   const userURL = {};
 
   for (let obj in urlDatabase) {
@@ -91,7 +91,7 @@ app.get("/usernotfound", (req, res) => {
 app.get("/urls", (req, res) => {
   if(req.cookies.user_id) {
     const user = findUserByEmail(usersDatabase, req.cookies["user_id"]);
-    const urlList = urlForUser(req.cookies.user_id);
+    const urlList = urlsForUser(req.cookies.user_id);
     const templateVars = {
       urls: urlList,
       user: user,
@@ -122,7 +122,6 @@ app.post("/login", (req, res) => {
     }
   }
   return res.status(403).send("Login email and password combination is not in our records!")
-  
 });
 
 
@@ -181,8 +180,13 @@ app.post("/urls", (req, res) => {
 
 // Delete URL
 app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-  res.redirect("/urls");
+  const cookie = req.cookies.user_id;
+  const shortURL = req.params.shortURL;
+  if (cookie && urlDatabase[shortURL].userID === cookie) {
+    delete urlDatabase[shortURL];
+    return res.redirect("/urls");
+  }
+  return res.redirect("/usernotfound");
 });
 
 
@@ -194,21 +198,26 @@ app.post("/logout", (req, res) => {
 
 // Update URL
 app.post("/urls/:shortURL/update", (req, res) => {
+  const cookie = req.cookies.user_id;
+  const shortURL = req.params.shortURL;
+  if (cookie && urlDatabase[shortURL].userID === cookie) {
   delete urlDatabase[req.params.shortURL]
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = {longURL:req.body["longURL"], userID: req.cookies["user_id"]};
-  res.redirect(`/urls/${shortURL}`);
+  urlDatabase[shortURL] = {longURL:req.body["longURL"], userID: cookie};
+  return res.redirect(`/urls/${shortURL}`);
+}
+return res.redirect("/usernotfound")
 });
 
 // after TinyURL page /urls/TinyURL page
 app.get("/urls/:shortURL", (req, res) => {
   const cookie = req.cookies.user_id;
-  const shortURL = req.params.shortURL
+  const shortURL = req.params.shortURL;
   if (cookie && urlDatabase[shortURL].userID === cookie) {
     const user = findUserByEmail(usersDatabase, cookie);
     const templateVars = { 
       shortURL: shortURL, 
-      longURL: urlForUser(cookie)[shortURL],
+      longURL: urlsForUser(cookie)[shortURL],
       user: user
     };
     req.params.shortURL = templateVars.shortURL;
@@ -219,9 +228,19 @@ app.get("/urls/:shortURL", (req, res) => {
 
 // TinyURL redirect to website
 app.get("/u/:shortURL", (req, res) => {
-  const url = urlDatabase[req.params.shortURL];
-  const longURL = url.longURL;
-  res.redirect(longURL);
+  const cookie = req.cookies.user_id;
+  const shortURL = req.params.shortURL
+  if(cookie && urlDatabase[shortURL].userID === cookie) {
+    const user = findUserByEmail(usersDatabase, cookie);
+    const templateVars = {
+      shortURL: shortURL,
+      longURL: urlsForUser(cookie)[shortURL],
+      user: user
+    };
+    req.params.shortURL = templateVars.shortURL;
+    return res.render("urls_show", templateVars);
+  }
+  res.redirect("/usernotfound");
 });
 
 app.listen(PORT, () => {
