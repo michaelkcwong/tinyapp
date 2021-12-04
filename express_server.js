@@ -52,6 +52,19 @@ const passwordMatch = (user, password) => {
   return false;
 };
 
+//function that gets user specific url from database
+const urlForUser = userID => {
+  const userURL = {};
+
+  for (let obj in urlDatabase) {
+    let urlList = urlDatabase[obj];
+    if (urlList.userID === userID) {
+      userURL[obj] = urlList.longURL;
+    }
+  }
+  return userURL;
+}
+
 //function that gets the user from the userDatabase
 findUserByEmail = (object, cookie) => {
   return object[cookie];
@@ -64,12 +77,16 @@ app.get("/", (req, res) => {
 
 // My URLs /urls page
 app.get("/urls", (req, res) => {
-  const user = findUserByEmail(usersDatabase, req.cookies["user_id"]);
-  const templateVars = {
-    urls: urlDatabase,
-    user: user
-  };
-  res.render("urls_index", templateVars);
+  if(req.cookies.user_id) {
+    const user = findUserByEmail(usersDatabase, req.cookies["user_id"]);
+    const urlList = urlForUser(req.cookies.user_id);
+    const templateVars = {
+      urls: urlList,
+      user: user,
+    };
+  return res.render("urls_index", templateVars);
+}
+return res.redirect("/login");
 });
 
 // GET /login page
@@ -144,7 +161,7 @@ app.get("/urls/new", (req, res) => {
 // TinyURL Creation page 
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body["longURL"];
+  urlDatabase[shortURL] = {longURL: req.body["longURL"], userID: req.cookies["user_id"]};
   res.redirect(`/urls/${shortURL}`);
   });
 
@@ -162,20 +179,22 @@ app.post("/logout", (req, res) => {
   res.redirect(`/login`);
 });
 
-// Edit URL
+// Update URL
 app.post("/urls/:shortURL/update", (req, res) => {
   delete urlDatabase[req.params.shortURL]
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body["longURL"];
+  urlDatabase[shortURL] = {longURL:req.body["longURL"], userID: req.cookies["user_id"]};
   res.redirect(`/urls/${shortURL}`);
 });
 
 // after TinyURL page /urls/TinyURL page
 app.get("/urls/:shortURL", (req, res) => {
-  const user = findUserByEmail(usersDatabase, req.cookies["user_id"]);
-  const templateVars = { 
-    shortURL: req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL],
+  const cookie = req.cookies.user_id;
+  const shortURL = req.params.shortURL;
+  const user = findUserByEmail(usersDatabase, cookie);
+  const templateVars = {
+    shortURL: shortURL,
+    longURL: urlForUser(cookie)[shortURL],
     user: user
   };
   req.params.shortURL = templateVars.shortURL;
@@ -184,7 +203,8 @@ app.get("/urls/:shortURL", (req, res) => {
 
 // TinyURL redirect to website
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const url = urlDatabase[req.params.shortURL];
+  const longURL = url.longURL;
   res.redirect(longURL);
 });
 
