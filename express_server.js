@@ -20,8 +20,8 @@ app.set("view engine", "ejs");
 
 //Database of shortURL and longURL
 const urlDatabase = {
-  "b2xVn2": "https://www.lighthouselabs.ca",
-  "9sm5xK": "https://www.google.com",
+  "b2xVn2": {longURL: "https://www.lighthouselabs.ca", userID: "abc"},
+  "9sm5xK": {longURL: "https://www.google.com", userID: "abc"}
 };
 
 //Database of users
