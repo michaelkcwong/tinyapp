@@ -49,6 +49,13 @@ describe('getRandomString', function() {
 
     assert.notEqual(user, expectedOutput);
   });
+
+  it('should return a string', function() {
+    const characters = generateRandomString();
+    const user = typeof characters;
+    const expectedOutput = "string";
+    assert.equal(user, expectedOutput);
+  });
 });
 
 describe('passwordMatch', function() {
@@ -89,7 +96,7 @@ describe('urlsForUser', function() {
       "9sm5xK": {longURL: "https://www.google.com", userID: "def"}
     };
 
-    it('should return {shortURLs: longURLs} objects from spefic user in our url database', function() {
+    it('should return {shortURLs: longURLs} objects from specific user in our url database', function() {
       const userInput = urlsForUser("abc", urlDatabase);
       const expectedOutput = {"b2xVn2": "https://www.lighthouselabs.ca"};
       assert.deepEqual(userInput, expectedOutput);
