@@ -36,9 +36,15 @@ const urlsForUser = (userID, urlDatabase) => {
   return userURL;
 }
 
+//function that gets the user from the userDatabase
+const findUser = (object, cookie) => {
+  return object[cookie];
+};
+
 module.exports = {
   getUserByEmail,
   generateRandomString,
   passwordMatch,
   urlsForUser,
+  findUser
 };

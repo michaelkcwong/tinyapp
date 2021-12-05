@@ -42,12 +42,8 @@ const { generateRandomString } = require("./helpers");
 const { passwordMatch } = require("./helpers");
 //function that gets user specific url from database
 const { urlsForUser }= require("./helpers");
- 
-
 //function that gets the user from the userDatabase
-findUserByEmail = (object, cookie) => {
-  return object[cookie];
-};
+const { findUser } = require("./helpers");
 
 // /localhost:8080
 app.get("/", (req, res) => {
@@ -69,7 +65,7 @@ app.get("/usernotfound", (req, res) => {
 // My URLs /urls page
 app.get("/urls", (req, res) => {
   if(req.session.user_id) {
-    const user = findUserByEmail(usersDatabase, req.session["user_id"]);
+    const user = findUser(usersDatabase, req.session["user_id"]);
     const urlList = urlsForUser(req.session.user_id, urlDatabase);
     const templateVars = {
       urls: urlList,
@@ -82,7 +78,7 @@ return res.redirect("/usernotfound");
 
 // GET /login page
 app.get("/login", (req, res) => {
-  const user = findUserByEmail(usersDatabase, req.session["user_id"]);
+  const user = findUser(usersDatabase, req.session["user_id"]);
   const templateVars = {
     user:user
   };
@@ -109,7 +105,7 @@ app.post("/login", (req, res) => {
 
 // GET /register page
 app.get('/register', (req, res) => {
-  const user = findUserByEmail(usersDatabase, req.session["user_id"]);
+  const user = findUser(usersDatabase, req.session["user_id"]);
   const templateVars = {
     user: user
   };
@@ -143,7 +139,7 @@ if(getUserByEmail(email, usersDatabase)) {
 // Create TinyURL page /urls/new
 app.get("/urls/new", (req, res) => {
   if (req.session["user_id"]) {
-    const user = findUserByEmail(usersDatabase, req.session["user_id"]);
+    const user = findUser(usersDatabase, req.session["user_id"]);
     const templateVars = {
       user: user
     };
@@ -197,7 +193,7 @@ app.get("/urls/:shortURL", (req, res) => {
   const cookie = req.session.user_id;
   const shortURL = req.params.shortURL;
   if (cookie && urlDatabase[shortURL].userID === cookie) {
-    const user = findUserByEmail(usersDatabase, cookie);
+    const user = findUser(usersDatabase, cookie);
     const templateVars = { 
       shortURL: shortURL, 
       longURL: urlsForUser(cookie, urlDatabase)[shortURL],
@@ -214,7 +210,7 @@ app.get("/u/:shortURL", (req, res) => {
   const cookie = req.session.user_id;
   const shortURL = req.params.shortURL
   if(cookie && urlDatabase[shortURL].userID === cookie) {
-    const user = findUserByEmail(usersDatabase, cookie);
+    const user = findUser(usersDatabase, cookie);
     const templateVars = {
       shortURL: shortURL,
       longURL: urlsForUser(cookie)[shortURL],
