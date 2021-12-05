@@ -14,11 +14,6 @@ app.use(cookieSession({
   keys: ["key1", "key2"],
 }));
 
-//function that generates a random string for user IDS
-const generateRandomString = function() {
-  return Math.random().toString(36).substring(2,8);
-  };
-
 //Template view engine to EJS
 app.set("view engine", "ejs");
 
@@ -37,8 +32,12 @@ const usersDatabase = {
   }
 };
 
+//Helper Functions
+
 //function for checking if the user already exists in users database
 const { getUserByEmail } = require("./helpers");
+//function that generates a random string for user IDS
+const { generateRandomString } = require("./helpers");
 
 //function for checking if the user's password matches what is in the userDatabase
 const passwordMatch = (user, password) => {
