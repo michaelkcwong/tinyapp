@@ -109,3 +109,21 @@ describe('urlsForUser', function() {
         assert.deepEqual(userInput, expectedOutput);
       });
   });
+
+  describe('findUser', function() {
+    it('should return a specific user object from the database with user id', function() {
+      const user = findUser(testUsers, "userRandomID");
+      const expectedOutput = {
+        id: "userRandomID", 
+        email: "user@example.com", 
+        password: "purple-monkey-dinosaur"
+      };
+      assert.deepEqual(user, expectedOutput);
+    });
+    it('should return undefined if user id is not in the database', function() {
+      const user = findUser(testUsers, "123");
+      const expectedOutput = undefined;
+    
+      assert.equal(user, expectedOutput);
+  });
+});
