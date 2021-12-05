@@ -34,16 +34,13 @@ const usersDatabase = {
 
 //Helper Functions
 
-//function for checking if the user already exists in users database
-const { getUserByEmail } = require("./helpers");
-//function that generates a random string for user IDS
-const { generateRandomString } = require("./helpers");
-//function for checking if the user's password matches what is in the userDatabase
-const { passwordMatch } = require("./helpers");
-//function that gets user specific url from database
-const { urlsForUser }= require("./helpers");
-//function that gets the user from the userDatabase
-const { findUser } = require("./helpers");
+const {
+  getUserByEmail,
+  generateRandomString,
+  passwordMatch,
+  urlsForUser,
+  findUser 
+} = require('./helpers')
 
 // /localhost:8080
 app.get("/", (req, res) => {

@@ -1,16 +1,13 @@
 const { assert } = require('chai');
 const bcrypt = require("bcrypt");
 
-//function for checking if the user already exists in users database
-const { getUserByEmail } = require("../helpers");
-//function that generates a random string for user IDS
-const { generateRandomString } = require("../helpers");
-//function for checking if the user's password matches what is in the userDatabase
-const { passwordMatch } = require("../helpers");
-//function that gets user specific url from database
-const { urlsForUser }= require("../helpers");
-//function that gets the user from the userDatabase
-const { findUser } = require("../helpers");
+const {
+  getUserByEmail,
+  generateRandomString,
+  passwordMatch,
+  urlsForUser,
+  findUser 
+} = require('../helpers')
 
 const testUsers = {
   "userRandomID": {
@@ -25,16 +22,29 @@ const testUsers = {
   }
 };
 
+const user = {
+  id: "userRandomID", 
+  email: "user@example.com", 
+  password: bcrypt.hashSync("purple-monkey-dinosaur",10)
+};
+
+const urlDatabase = {
+  "b2xVn2": {longURL: "https://www.lighthouselabs.ca", userID: "abc"},
+  "9sm5xK": {longURL: "https://www.google.com", userID: "def"}
+};
+
 describe('getUserByEmail', function() {
   it('should return a user with valid email', function() {
     const user = getUserByEmail("user@example.com", testUsers).id;
     const expectedOutput = "userRandomID";
+
     assert.equal(user, expectedOutput);
   });
 
   it('should return undefined with a non-existent email', function() {
     const user = getUserByEmail("non-existent@example.com", testUsers).id;
     const expectedOutput = undefined;
+
     assert.equal(user, expectedOutput);
   });
 
@@ -54,6 +64,7 @@ describe('getRandomString', function() {
     const characters = generateRandomString();
     const user = typeof characters;
     const expectedOutput = "string";
+
     assert.equal(user, expectedOutput);
   });
 });
@@ -61,26 +72,14 @@ describe('getRandomString', function() {
 describe('passwordMatch', function() {
   it('should return true if the password matches in our user database', function() {
 
-    const user = {
-    id: "userRandomID", 
-    email: "user@example.com", 
-    password: bcrypt.hashSync("purple-monkey-dinosaur",10)
-  };
-
   const password = "purple-monkey-dinosaur";
   const userInput = passwordMatch(user, password);
   const expectedOutput = true;
-  
+
   assert.equal(userInput, expectedOutput);
   });
 
   it('should return undefined if the password does not match in our user database', function() {
-
-    const user = {
-    id: "userRandomID", 
-    email: "user@example.com", 
-    password: bcrypt.hashSync("purple-monkey-dinosaur",10)
-  };
 
   const password = "password not match";
   const userInput = passwordMatch(user, password);
@@ -91,14 +90,11 @@ describe('passwordMatch', function() {
 });
 
 describe('urlsForUser', function() {
-    const urlDatabase = {
-      "b2xVn2": {longURL: "https://www.lighthouselabs.ca", userID: "abc"},
-      "9sm5xK": {longURL: "https://www.google.com", userID: "def"}
-    };
 
     it('should return {shortURLs: longURLs} objects from specific user in our url database', function() {
       const userInput = urlsForUser("abc", urlDatabase);
       const expectedOutput = {"b2xVn2": "https://www.lighthouselabs.ca"};
+
       assert.deepEqual(userInput, expectedOutput);
     });
   
@@ -106,6 +102,7 @@ describe('urlsForUser', function() {
 
         const userInput = urlsForUser("ghi", urlDatabase);
         const expectedOutput = {};
+
         assert.deepEqual(userInput, expectedOutput);
       });
   });
@@ -118,7 +115,9 @@ describe('urlsForUser', function() {
         email: "user@example.com", 
         password: "purple-monkey-dinosaur"
       };
+
       assert.deepEqual(user, expectedOutput);
+
     });
     it('should return undefined if user id is not in the database', function() {
       const user = findUser(testUsers, "123");
