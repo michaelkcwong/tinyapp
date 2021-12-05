@@ -14,7 +14,17 @@ const generateRandomString = function() {
   return Math.random().toString(36).substring(2,8);
   };
 
+//function for checking if the user's password matches what is in the userDatabase
+const bcrypt = require("bcrypt");
+const passwordMatch = (user, password) => {
+  if (bcrypt.compareSync(password, user.password)) {
+    return true;
+  }
+  return false;
+};
+
 module.exports = {
   getUserByEmail,
   generateRandomString,
+  passwordMatch,
 };

@@ -38,14 +38,9 @@ const usersDatabase = {
 const { getUserByEmail } = require("./helpers");
 //function that generates a random string for user IDS
 const { generateRandomString } = require("./helpers");
-
 //function for checking if the user's password matches what is in the userDatabase
-const passwordMatch = (user, password) => {
-  if (bcrypt.compareSync(password, user.password)) {
-    return true;
-  }
-  return false;
-};
+const { passwordMatch } = require("./helpers");
+
 
 //function that gets user specific url from database
 const urlsForUser = userID => {
