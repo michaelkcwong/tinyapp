@@ -82,3 +82,23 @@ describe('passwordMatch', function() {
   assert.equal(userInput, expectedOutput);
   });
 });
+
+describe('urlsForUser', function() {
+    const urlDatabase = {
+      "b2xVn2": {longURL: "https://www.lighthouselabs.ca", userID: "abc"},
+      "9sm5xK": {longURL: "https://www.google.com", userID: "def"}
+    };
+
+    it('should return {shortURLs: longURLs} objects from spefic user in our url database', function() {
+      const userInput = urlsForUser("abc", urlDatabase);
+      const expectedOutput = {"b2xVn2": "https://www.lighthouselabs.ca"};
+      assert.deepEqual(userInput, expectedOutput);
+    });
+  
+    it('should return an empty object if the user is not in our url database', function() {
+
+        const userInput = urlsForUser("ghi", urlDatabase);
+        const expectedOutput = {};
+        assert.deepEqual(userInput, expectedOutput);
+      });
+  });
