@@ -20,7 +20,7 @@ const passwordMatch = (user, password) => {
   if (bcrypt.compareSync(password, user.password)) {
     return true;
   }
-  return false;
+  return undefined;
 };
 
 //function that gets user specific url from database

@@ -1,4 +1,6 @@
 const { assert } = require('chai');
+const bcrypt = require("bcrypt");
+
 //function for checking if the user already exists in users database
 const { getUserByEmail } = require("../helpers");
 //function that generates a random string for user IDS
@@ -46,5 +48,37 @@ describe('getRandomString', function() {
     const expectedOutput = string2;
 
     assert.notEqual(user, expectedOutput);
+  });
+});
+
+describe('passwordMatch', function() {
+  it('should return true if the password matches in our user database', function() {
+
+    const user = {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: bcrypt.hashSync("purple-monkey-dinosaur",10)
+  };
+
+  const password = "purple-monkey-dinosaur";
+  const userInput = passwordMatch(user, password);
+  const expectedOutput = true;
+  
+  assert.equal(userInput, expectedOutput);
+  });
+
+  it('should return undefined if the password does not match in our user database', function() {
+
+    const user = {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: bcrypt.hashSync("purple-monkey-dinosaur",10)
+  };
+
+  const password = "password not match";
+  const userInput = passwordMatch(user, password);
+  const expectedOutput = undefined;
+  
+  assert.equal(userInput, expectedOutput);
   });
 });
