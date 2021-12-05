@@ -38,7 +38,7 @@ const usersDatabase = {
 };
 
 //function for checking if the user already exists in users database
-const existingUserInUsers = (email) => {
+const getUserByEmail = function(email, database) {
   for (let obj in usersDatabase) {
     let user = usersDatabase[obj];
     if (user.email === email) {
@@ -121,8 +121,8 @@ app.post("/login", (req, res) => {
   if (!email || !password) {
     return res.status(400).send('Email and password cannot be empty!');
   }
-  if (existingUserInUsers(email)) {
-    const user = existingUserInUsers(email);
+  if (getUserByEmail(email, usersDatabase)) {
+    const user = getUserByEmail(email, usersDatabase);
     if (passwordMatch(user, password)) {
       req.session.user_id = user.id;
       return res.redirect("/urls");
@@ -154,7 +154,7 @@ app.post('/register', (req, res) => {
   }
 
 //validate if user exists
-if(existingUserInUsers(email)) {
+if(getUserByEmail(email, usersDatabase)) {
   return res.status(400).send('Email is already registered!');
 }
   newUser["id"] = randomID
