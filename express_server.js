@@ -38,15 +38,7 @@ const usersDatabase = {
 };
 
 //function for checking if the user already exists in users database
-const getUserByEmail = function(email, database) {
-  for (let obj in usersDatabase) {
-    let user = usersDatabase[obj];
-    if (user.email === email) {
-      return user;
-  }
-}
-  return false;
-};
+const { getUserByEmail } = require("./helpers");
 
 //function for checking if the user's password matches what is in the userDatabase
 const passwordMatch = (user, password) => {
