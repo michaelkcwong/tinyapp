@@ -40,20 +40,9 @@ const { getUserByEmail } = require("./helpers");
 const { generateRandomString } = require("./helpers");
 //function for checking if the user's password matches what is in the userDatabase
 const { passwordMatch } = require("./helpers");
-
-
 //function that gets user specific url from database
-const urlsForUser = userID => {
-  const userURL = {};
-
-  for (let obj in urlDatabase) {
-    let urlList = urlDatabase[obj];
-    if (urlList.userID === userID) {
-      userURL[obj] = urlList.longURL;
-    }
-  }
-  return userURL;
-}
+const { urlsForUser }= require("./helpers");
+ 
 
 //function that gets the user from the userDatabase
 findUserByEmail = (object, cookie) => {
@@ -81,7 +70,7 @@ app.get("/usernotfound", (req, res) => {
 app.get("/urls", (req, res) => {
   if(req.session.user_id) {
     const user = findUserByEmail(usersDatabase, req.session["user_id"]);
-    const urlList = urlsForUser(req.session.user_id);
+    const urlList = urlsForUser(req.session.user_id, urlDatabase);
     const templateVars = {
       urls: urlList,
       user: user,
@@ -211,7 +200,7 @@ app.get("/urls/:shortURL", (req, res) => {
     const user = findUserByEmail(usersDatabase, cookie);
     const templateVars = { 
       shortURL: shortURL, 
-      longURL: urlsForUser(cookie)[shortURL],
+      longURL: urlsForUser(cookie, urlDatabase)[shortURL],
       user: user
     };
     req.params.shortURL = templateVars.shortURL;
