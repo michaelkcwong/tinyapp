@@ -23,7 +23,7 @@ const passwordMatch = (user, password) => {
   return undefined;
 };
 
-//function that gets user specific url from database
+//function that gets url objects from specific users in the url database
 const urlsForUser = (userID, urlDatabase) => {
   const userURL = {};
 
@@ -36,7 +36,7 @@ const urlsForUser = (userID, urlDatabase) => {
   return userURL;
 }
 
-//function that gets the user from the userDatabase
+//function that gets the user from the user database
 const findUser = (object, cookie) => {
   return object[cookie];
 };

@@ -47,7 +47,6 @@ describe('getUserByEmail', function() {
 
     assert.equal(user, expectedOutput);
   });
-
 });
 
 describe('getRandomString', function() {
@@ -90,39 +89,37 @@ describe('passwordMatch', function() {
 });
 
 describe('urlsForUser', function() {
+  it('should return {shortURLs: longURLs} objects from specific user in our url database', function() {
+  const userInput = urlsForUser("abc", urlDatabase);
+  const expectedOutput = {"b2xVn2": "https://www.lighthouselabs.ca"};
 
-    it('should return {shortURLs: longURLs} objects from specific user in our url database', function() {
-      const userInput = urlsForUser("abc", urlDatabase);
-      const expectedOutput = {"b2xVn2": "https://www.lighthouselabs.ca"};
-
-      assert.deepEqual(userInput, expectedOutput);
-    });
-  
-    it('should return an empty object if the user is not in our url database', function() {
-
-        const userInput = urlsForUser("ghi", urlDatabase);
-        const expectedOutput = {};
-
-        assert.deepEqual(userInput, expectedOutput);
-      });
+  assert.deepEqual(userInput, expectedOutput);
   });
+  
+  it('should return an empty object if the user is not in our url database', function() {
+  const userInput = urlsForUser("ghi", urlDatabase);
+  const expectedOutput = {};
 
-  describe('findUser', function() {
-    it('should return a specific user object from the database with user id', function() {
-      const user = findUser(testUsers, "userRandomID");
-      const expectedOutput = {
-        id: "userRandomID", 
-        email: "user@example.com", 
-        password: "purple-monkey-dinosaur"
-      };
+  assert.deepEqual(userInput, expectedOutput);
+  });
+});
 
-      assert.deepEqual(user, expectedOutput);
+describe('findUser', function() {
+  it('should return a specific user object from the database with user id', function() {
+  const user = findUser(testUsers, "userRandomID");
+  const expectedOutput = {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+    };
 
-    });
-    it('should return undefined if user id is not in the database', function() {
-      const user = findUser(testUsers, "123");
-      const expectedOutput = undefined;
-    
-      assert.equal(user, expectedOutput);
+    assert.deepEqual(user, expectedOutput);
+
+  });
+  it('should return undefined if user id is not in the database', function() {
+  const user = findUser(testUsers, "123");
+  const expectedOutput = undefined;
+  
+  assert.equal(user, expectedOutput);
   });
 });
