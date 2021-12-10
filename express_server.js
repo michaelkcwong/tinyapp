@@ -44,7 +44,8 @@ const {
   generateRandomString,
   passwordMatch,
   urlsForUser,
-  findUser 
+  findUser,
+  isValidHttpUrl
 } = require('./helpers')
 
 //Get Requests
@@ -54,17 +55,17 @@ app.get("/", (req, res) => {
   res.redirect("/login");
 });
 
-//User not found page
-app.get("/usernotfound", (req, res) => {
-  if (!req.session.user_id) {
-    const user = null;
-    const templateVars = {
-      user: user,
-    };
-    return res.render("require_login", templateVars);
-  }
-  return res.redirect("/urls");
-});
+// //User not found page
+// app.get("/usernotfound", (req, res) => {
+//   if (!req.session.user_id) {
+//     const user = null;
+//     const templateVars = {
+//       user: user,
+//     };
+//     return res.render("require_login", templateVars);
+//   }
+//   return res.redirect("/urls");
+// });
 
 //My URLs page
 app.get("/urls", (req, res) => {
@@ -77,7 +78,7 @@ app.get("/urls", (req, res) => {
     };
   return res.render("urls_index", templateVars);
 }
-return res.redirect("/usernotfound");
+return res.redirect("/login");
 });
 
 // Login page
@@ -107,7 +108,7 @@ app.get("/urls/new", (req, res) => {
     };
     return res.render("urls_new", templateVars);
   }
-  return res.redirect("/usernotfound");
+  return res.redirect("/login");
 });
 
 //After TinyURL page submission page
@@ -197,6 +198,10 @@ app.post("/urls", (req, res) => {
   if (!longURL) {
     return res.status(400).send('Please type in URL!');
   }
+
+  if (!isValidHttpUrl()) {
+    return res.status(400).send('Please type in a valid url');
+  } 
 
   urlDatabase[shortURL] = {longURL: req.body["longURL"], userID: cookie};
   res.redirect(`/urls/${shortURL}`);
