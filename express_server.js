@@ -51,7 +51,7 @@ const {
 
 // localhost:8080 Home Page
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect("/login");
 });
 
 //User not found page
