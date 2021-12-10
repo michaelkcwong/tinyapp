@@ -111,6 +111,7 @@ app.get("/urls/new", (req, res) => {
   return res.redirect("/login");
 });
 
+
 //After TinyURL page submission page
 app.get("/urls/:shortURL", (req, res) => {
   const cookie = req.session.user_id;
@@ -125,7 +126,7 @@ app.get("/urls/:shortURL", (req, res) => {
     req.params.shortURL = templateVars.shortURL;
     return res.render("urls_show", templateVars);
   }
-  return res.redirect("/usernotfound");
+  return res.redirect("/login");
 });
 
 //TinyURL redirect to website
@@ -142,7 +143,7 @@ app.get("/u/:shortURL", (req, res) => {
     req.params.shortURL = templateVars.shortURL;
     return res.render("urls_show", templateVars);
   }
-  res.redirect("/usernotfound");
+  res.redirect("/login");
 });
 
 //Post requests
@@ -199,8 +200,8 @@ app.post("/urls", (req, res) => {
     return res.status(400).send('Please type in URL!');
   }
 
-  if (!isValidHttpUrl()) {
-    return res.status(400).send('Please type in a valid url');
+  if (!isValidHttpUrl(longURL)) {
+    return res.status(400).send('Please type in a valid url!');
   } 
 
   urlDatabase[shortURL] = {longURL: req.body["longURL"], userID: cookie};
@@ -215,7 +216,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     delete urlDatabase[shortURL];
     return res.redirect("/urls");
   }
-  return res.redirect("/usernotfound");
+  return res.redirect("/login");
 });
 
 //Logging Out 
@@ -240,10 +241,10 @@ app.post("/urls/:shortURL/update", (req, res) => {
   urlDatabase[shortURL] = {longURL:req.body["longURL"], userID: cookie};
   return res.redirect(`/urls/${shortURL}`);
 }
-return res.redirect("/usernotfound")
+return res.redirect("/login")
 });
 
-//Tiny app listening on PORT 
+//Tiny app listening on PORT
 app.listen(PORT, () => {
   console.log(`Tinyapp listening on port ${PORT}!`);
 });

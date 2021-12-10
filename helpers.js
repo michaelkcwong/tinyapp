@@ -41,7 +41,9 @@ const findUser = (object, cookie) => {
   return object[cookie];
 };
 
+//function to check if url is valid
 function isValidHttpUrl(string) {
+
   let url;
   
   try {
@@ -49,7 +51,6 @@ function isValidHttpUrl(string) {
   } catch (_) {
     return false;  
   }
-
   return url.protocol === "http:" || url.protocol === "https:";
 }
 
