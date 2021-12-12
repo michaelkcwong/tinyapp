@@ -55,17 +55,6 @@ app.get("/", (req, res) => {
   res.redirect("/login");
 });
 
-// //User not found page
-// app.get("/usernotfound", (req, res) => {
-//   if (!req.session.user_id) {
-//     const user = null;
-//     const templateVars = {
-//       user: user,
-//     };
-//     return res.render("require_login", templateVars);
-//   }
-//   return res.redirect("/urls");
-// });
 
 //My URLs page
 app.get("/urls", (req, res) => {
