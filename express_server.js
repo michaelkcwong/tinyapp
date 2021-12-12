@@ -99,6 +99,7 @@ app.get('/register', (req, res) => {
   res.render('registration', templateVars)
 });
 
+
 //Create TinyURL page
 app.get("/urls/new", (req, res) => {
   if (req.session["user_id"]) {
@@ -131,19 +132,10 @@ app.get("/urls/:shortURL", (req, res) => {
 
 //TinyURL redirect to website
 app.get("/u/:shortURL", (req, res) => {
-  const cookie = req.session.user_id;
-  const shortURL = req.params.shortURL
-  if(cookie && urlDatabase[shortURL].userID === cookie) {
-    const user = findUser(usersDatabase, cookie);
-    const templateVars = {
-      shortURL: shortURL,
-      longURL: urlsForUser(cookie)[shortURL],
-      user: user
-    };
-    req.params.shortURL = templateVars.shortURL;
-    return res.render("urls_show", templateVars);
-  }
-  res.redirect("/login");
+  const urls = urlDatabase[req.params.shortURL];
+
+  const longURL = urls.longURL;
+  res.redirect(longURL);
 });
 
 //Post requests
@@ -202,10 +194,11 @@ app.post("/urls", (req, res) => {
 
   if (!isValidHttpUrl(longURL)) {
     return res.status(400).send('Please type in a valid url!');
-  } 
+  }
 
   urlDatabase[shortURL] = {longURL: req.body["longURL"], userID: cookie};
   res.redirect(`/urls/${shortURL}`);
+  
   });
 
 //Delete URL
@@ -234,6 +227,10 @@ app.post("/urls/:shortURL/update", (req, res) => {
   if (!longURL) {
     return res.status(400).send('Please type in URL!');
   }
+
+  if (!isValidHttpUrl(longURL)) {
+    return res.status(400).send('Please type in a valid url!');
+  } 
 
   if (cookie && urlDatabase[shortURL].userID === cookie) {
   delete urlDatabase[req.params.shortURL]
